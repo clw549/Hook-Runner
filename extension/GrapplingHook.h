@@ -6,20 +6,24 @@
 #include <cstdlib>
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/classes/collision_shape2d.hpp>
+#include <godot_cpp/classes/line2d.hpp>
+#include <godot_cpp/classes/kinematic_collision2d.hpp>
+
 
 namespace godot {
   class GrapplingHook : public CharacterBody2D {
     GDCLASS(GrapplingHook, CharacterBody2D)
 
     private:
-      Vector2 _hookPosition;
-      float _maxLength = 200;
-      float _currentLength = 50;
+      Vector2 _hook_position;
+      float _maxLength = 400;
+      float _currentLength = 200;
       bool _showGuide;
       bool _hooked = false;
       void OnHookHitBody(KinematicCollision2D *collision);
       Vector2 _shoot_direction = Vector2(1, 0);
-      Node2D *_player;
+      Node2D *_player = nullptr;
+      Line2D *_rope_line =nullptr;
 
       
 
@@ -31,10 +35,11 @@ namespace godot {
       float speed;
       CollisionShape2D *collider;
       Vector2 velocity = Vector2(1,0);
+      Vector2 position;
 
-      void _physics_process(double delta);
+      void _physics_process(double delta) override;
 
-      void _ready();
+      void _ready() override;
       GrapplingHook();
       ~GrapplingHook();
       void ShootHook(Vector2 direction);
@@ -49,7 +54,7 @@ namespace godot {
       float GetSpeed();
 
       Node2D *GetPlayer();
-      void SetPlayer(Node2D newPlayer);
+      void SetPlayer(Node2D *newPlayer);
   };
 }
 

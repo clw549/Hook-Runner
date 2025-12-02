@@ -8,7 +8,6 @@ void GrapplingHook::_bind_methods() {
   ClassDB::bind_method(D_METHOD("ShootHook", "direction"), &GrapplingHook::ShootHook);
   ClassDB::bind_method(D_METHOD("RetractHook"), &GrapplingHook::RetractHook);
   ClassDB::bind_method(D_METHOD("SetMaxHookLength", "length"), &GrapplingHook::SetMaxHookLength);
-  ClassDB::bind_method(D_METHOD("_ready"), &GrapplingHook::_ready);
 
   ClassDB::bind_method(D_METHOD("GetGrapplingHook"), &GrapplingHook::GetGrapplingHook);
   ClassDB::bind_method(D_METHOD("SetGrapplingHook", "hook"), &GrapplingHook::SetGrapplingHook);
@@ -30,6 +29,12 @@ void GrapplingHook::_bind_methods() {
 void GrapplingHook::_ready() {
   collider = get_node<CollisionShape2D>("CollisionShape2D");
   collider->connect("body_entered", Callable(this, "OnHookHitBody"));
+  _rope_line = get_node<Line2D>("Line");
+    if (_rope_line) {
+        _rope_line->clear_points();
+        _rope_line->add_point(Vector2(0,0)); // start
+        _rope_line->add_point(Vector2()); // end
+    }
 }
 
 GrapplingHook::GrapplingHook() {
@@ -42,15 +47,41 @@ GrapplingHook::~GrapplingHook() {
 }
 
 void GrapplingHook::_physics_process(double delta) {
-    velocity = _shoot_direction * speed;
+  _hook_position = get_position();
+  Vector2 player_pos = _player->get_global_position();
 
-    // move and get collision
-    Ref<KinematicCollision2D> collision = move_and_collide(velocity * delta);
+  
+    if (!_hooked) {
+        // Move hook linearly
+        velocity = _shoot_direction * speed;
 
-    if (collision.is_valid()) {
-        OnHookHitBody(collision.ptr()); 
+        Ref<KinematicCollision2D> collision = move_and_collide(velocity * delta);
+        if (collision.is_valid()) {
+            OnHookHitBody(collision.ptr());
+        }
+    } else {
+        // Hook is static, maybe rotate/animate it if needed
+        velocity = Vector2(0,0);
+
+        if (_player) {
+            // Constrain player around hook
+            Vector2 rope = _player->get_global_position() - _hook_position;
+            float dist = rope.length();
+            if (dist > _maxLength) {
+                Vector2 corrected = _hook_position + rope.normalized() * _maxLength;
+                _player->set_global_position(corrected);
+            }
+        }
     }
+    if (_rope_line && _player) {
+      _rope_line->set_point_position(1, _rope_line->to_local(_player->get_global_position()));
+      _rope_line->set_visible(true);
+      _rope_line->set_width(4.0);
+      _rope_line->set_default_color(Color(1,0,0));
+    }
+
 }
+
 
 void GrapplingHook::ShootHook(Vector2 direction) {
   _shoot_direction = direction.normalized();
@@ -65,6 +96,7 @@ void GrapplingHook::RetractHook() {
 void GrapplingHook::OnHookHitBody(KinematicCollision2D *collision) {
   _shoot_direction = Vector2(0,0);
   UtilityFunctions::print("Hook touched body");
+  _hooked=true;
 
 
 }
@@ -93,7 +125,7 @@ float GrapplingHook::GetSpeed() {
 }
 
 void GrapplingHook::SetPlayer(Node2D *newPlayer) {
-  _player = newPlayer
+  _player = newPlayer;
 }
 Node2D *GrapplingHook::GetPlayer() {
   return _player;

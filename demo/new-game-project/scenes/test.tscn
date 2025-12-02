@@ -18,5 +18,17 @@ shape = SubResource("CircleShape2D_ppyta")
 modulate = Color(1, 0, 1, 1)
 texture = ExtResource("1_8uh7m")
 
-[node name="GrapplingHook" parent="." instance=ExtResource("2_6uqi0")]
-position = Vector2(225, -4)
+[node name="RigidBody2D2" type="RigidBody2D" parent="."]
+position = Vector2(768, 5)
+linear_velocity = Vector2(20, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D2"]
+shape = SubResource("CircleShape2D_ppyta")
+
+[node name="Sprite2D" type="Sprite2D" parent="RigidBody2D2"]
+modulate = Color(1, 0, 1, 1)
+texture = ExtResource("1_8uh7m")
+
+[node name="GrapplingHook" parent="." node_paths=PackedStringArray("_player") instance=ExtResource("2_6uqi0")]
+_player = NodePath("../RigidBody2D2")
+position = Vector2(310, 6)

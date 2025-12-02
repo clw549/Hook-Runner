@@ -12,3 +12,5 @@ shape = SubResource("CircleShape2D_pmbmu")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_636o4")
+
+[node name="Line" type="Line2D" parent="."]
