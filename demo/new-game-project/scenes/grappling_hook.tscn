@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://dmx6voixm40f"]
+
+[ext_resource type="Texture2D" uid="uid://c6l7mmrspyot1" path="res://icon.svg" id="1_636o4"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_pmbmu"]
+radius = 61.0
+
+[node name="GrapplingHook" type="GrapplingHook"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_pmbmu")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_636o4")

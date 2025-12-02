@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://dds1sopkpptlb"]
+
+[ext_resource type="Texture2D" uid="uid://c6l7mmrspyot1" path="res://icon.svg" id="1_8uh7m"]
+[ext_resource type="PackedScene" uid="uid://dmx6voixm40f" path="res://scenes/grappling_hook.tscn" id="2_6uqi0"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ppyta"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+position = Vector2(500, 0)
+gravity_scale = 0.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
+shape = SubResource("CircleShape2D_ppyta")
+
+[node name="Sprite2D" type="Sprite2D" parent="RigidBody2D"]
+modulate = Color(1, 0, 1, 1)
+texture = ExtResource("1_8uh7m")
+
+[node name="GrapplingHook" parent="." instance=ExtResource("2_6uqi0")]
+position = Vector2(225, -4)
