@@ -6,11 +6,18 @@
 radius = 61.0
 
 [node name="GrapplingHook" type="GrapplingHook"]
+visible = true
+modulate = Color(1, 1, 1, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_pmbmu")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 0, 0, 1)
+scale = Vector2(0.5, 0.5)
 texture = ExtResource("1_636o4")
 
 [node name="Line" type="Line2D" parent="."]
+visible = true
+width = 5.0
+default_color = Color(1, 1, 0, 1)
