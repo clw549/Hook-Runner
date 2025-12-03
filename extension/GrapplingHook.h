@@ -18,9 +18,8 @@ namespace godot {
       Vector2 _hook_position;
       float _maxLength = 800;
       float _currentLength = 400;
-      float _minRopeLen = 100;
+      float _minRopeLen = 50;
       bool _showGuide = false;
-      bool _hooked = false;
       Vector2 _shoot_direction = Vector2(1, 0);
       CharacterBody2D *_player = nullptr;
       Line2D *_rope_line =nullptr;
@@ -44,6 +43,7 @@ namespace godot {
       CollisionShape2D *collider;
       Vector2 velocity = Vector2(1,0);
       Vector2 position;
+      bool hooked = false;
 
       void _physics_process(double delta) override;
 
@@ -76,6 +76,12 @@ namespace godot {
       void SetCurrentLength(float length);
       float GetCurrentLength();
       void IncrementCurrentLength(float addLength);
+
+      void SetHooked(bool newHooked);
+      bool GetHooked();
+
+      void SetClimbSpeed(float newClimbSpeed);
+      float GetClimbSpeed();
   };
 }
 

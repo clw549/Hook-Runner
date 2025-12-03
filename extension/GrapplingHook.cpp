@@ -24,7 +24,16 @@ void GrapplingHook::_bind_methods() {
 
   ClassDB::add_property("GrapplingHook", PropertyInfo(Variant::FLOAT, "speed", PROPERTY_HINT_NODE_TYPE, "float"), "SetSpeed", "GetSpeed");
 
-  ClassDB::add_property("GrapplingHook", PropertyInfo(Variant::OBJECT, "_player", PROPERTY_HINT_NODE_TYPE, "Node2D"), "SetPlayer", "GetPlayer");
+  ClassDB::add_property("GrapplingHook", PropertyInfo(Variant::BOOL, "hooked", PROPERTY_HINT_NODE_TYPE, "bool"), "SetHooked", "GetHooked");
+
+
+  ClassDB::add_property("GrapplingHook", PropertyInfo(Variant::OBJECT, "_player", PROPERTY_HINT_NODE_TYPE, "CharacterBody2D"), "SetPlayer", "GetPlayer");
+  ClassDB::bind_method(D_METHOD("SetHooked", "newHooked"), &GrapplingHook::SetHooked);
+  ClassDB::bind_method(D_METHOD("GetHooked"), &GrapplingHook::GetHooked);
+
+  ClassDB::add_property("GrapplingHook", PropertyInfo(Variant::FLOAT, "climbSpeed", PROPERTY_HINT_NODE_TYPE, "float"), "SetClimbSpeed", "GetClimbSpeed");
+  ClassDB::bind_method(D_METHOD("SetClimbSpeed", "newClimbSpeed"), &GrapplingHook::SetClimbSpeed);
+  ClassDB::bind_method(D_METHOD("GetClimbSpeed"), &GrapplingHook::GetClimbSpeed);
 
   ClassDB::bind_method(D_METHOD("OnHookHitBody", "body"), &GrapplingHook::OnHookHitBody);
 
@@ -66,7 +75,7 @@ void GrapplingHook::_physics_process(double delta) {
     Vector2 to_hook = _hook_position - player_pos;     // player → hook
     float dist = rope.length();
 
-    if (!_hooked) {
+    if (!hooked) {
         // Move the hook forward
         velocity = _shoot_direction * speed;
 
@@ -82,29 +91,24 @@ void GrapplingHook::_physics_process(double delta) {
             _currentLength = dist;  
         }
     }
-    else {
-        // Hook is stationary
-        velocity = Vector2(0, 0);
+    else if (_player && dist >= _currentLength){
+      // Hook is stationary
+      velocity = Vector2(0, 0);
+      Vector2 corrected = _hook_position + rope.normalized() * _currentLength;
+      _player->set_global_position(corrected);
 
-        if (_player) {
-            // 1. Enforce rope length
-            if (dist > _currentLength) {
-                Vector2 corrected = _hook_position + rope.normalized() * _currentLength;
-                _player->set_global_position(corrected);
-            }
+      // 2. Remove radial (in/outward) velocity component
+      Vector2 player_vel = _player->get_velocity();
 
-            // 2. Remove radial (in/outward) velocity component
-            Vector2 player_vel = _player->get_velocity();
+      // projection of velocity onto rope direction
+      float radial = player_vel.dot(to_hook.normalized());
 
-            // projection of velocity onto rope direction
-            float radial = player_vel.dot(to_hook.normalized());
-
-            if (radial < 0) {
-                // remove radial component → keeps tangential velocity for swinging
-                Vector2 tangential = player_vel - to_hook.normalized() * radial;
-                _player->set_velocity(tangential);
-            }
-        }
+      if (radial < 0) {
+        // remove radial component → keeps tangential velocity for swinging
+        Vector2 tangential = player_vel - to_hook.normalized() * radial;
+        _player->set_velocity(tangential);
+                      
+      }
     }
 
     // Draw rope line
@@ -123,11 +127,12 @@ void GrapplingHook::CorrectPlayerPhysics() {
 
 
 void GrapplingHook::ShootHook(Vector2 direction) {
-  if (_hooked) return; // Don't shoot if already hooked
+  if (hooked) return; // Don't shoot if already hooked
+  set_position(_player->get_global_position());
   set_physics_process(true);
 
   _shoot_direction = direction.normalized();
-  _hooked = false;
+  hooked = false;
 
   // Position hook at player position to start shooting
   if (_player) {
@@ -138,7 +143,7 @@ void GrapplingHook::ShootHook(Vector2 direction) {
 }
 
 void GrapplingHook::RetractHook() {
-  _hooked = false;
+  hooked = false;
   _shoot_direction = Vector2(0, 0);
   set_visible(false);
   _currentLength = 0;
@@ -152,7 +157,7 @@ void GrapplingHook::RetractHook() {
 void GrapplingHook::OnHookHitBody(KinematicCollision2D *collision) {
   _shoot_direction = Vector2(0,0);
   UtilityFunctions::print("Hook touched body");
-  _hooked=true;
+  hooked=true;
 
 
 }
@@ -207,8 +212,25 @@ float GrapplingHook::GetCurrentLength() {
 }
 void GrapplingHook::IncrementCurrentLength(float addLength) {
   //clamping values min <= current <= max
+  UtilityFunctions::print("addLength called Current len: %f",_currentLength);
   addLength = addLength*climbSpeed;
   if (_currentLength+addLength < _minRopeLen) _currentLength = _minRopeLen;
   else if (_currentLength+addLength > _maxLength) _currentLength = _maxLength;
   else _currentLength += addLength;
+}
+
+void GrapplingHook::SetHooked(bool newHooked) {
+  //property for get method
+  return;
+}
+
+bool GrapplingHook::GetHooked() {
+  return hooked;
+}
+
+float GrapplingHook::GetClimbSpeed() {
+  return climbSpeed;
+}
+void GrapplingHook::SetClimbSpeed(float newClimbSpeed) {
+  climbSpeed = newClimbSpeed;
 }

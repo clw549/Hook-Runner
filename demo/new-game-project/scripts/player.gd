@@ -14,6 +14,7 @@ func _ready():
 		# Move hook off-screen initially
 		hook.global_position = Vector2(-10000, -10000)
 		hook.set_visible(true)  # Force visible for debugging
+		hook.SetClimbSpeed(100.0)
 		print("Hook initialized")
 	else:
 		print("ERROR: Hook node not assigned!")
@@ -59,8 +60,13 @@ func _physics_process(delta):
 		velocity.y += gravity * delta
 
 	# Jump - uses "jump" action (SPACE, W, or UP arrow)
-	if Input.is_action_just_pressed("jump") and is_on_floor():
-		velocity.y = JUMP_VELOCITY
+	if Input.is_action_pressed("jump"):
+		if is_on_floor():
+			velocity.y = JUMP_VELOCITY
+		elif hook.GetHooked():
+			hook.IncrementCurrentLength(-(float(delta)));
+	elif Input.is_action_pressed("lower"):
+		hook.IncrementCurrentLength((float(delta)));
 
 	# Horizontal movement - uses custom move_left/move_right actions (A/D or Arrow Keys)
 	var direction = Input.get_axis("move_left", "move_right")
@@ -111,16 +117,11 @@ func shoot_hook():
 	hook.ShootHook(direction);
 
 	# Position hook at player and shoot it out
-	hook.global_position = global_position
+	#hook.global_position = global_position
 	#hook_start_pos = global_position
 	#hook_velocity = direction * HOOK_SHOOT_SPEED
 	#is_hook_shooting = true
 
-	# Make hook and rope visible
-	hook.set_visible(true)
-	var rope_line = hook.get_node_or_null("Line")
-	if rope_line:
-		rope_line.set_visible(true)
 
 func retract_hook():
 	print("Releasing hook!")
@@ -144,7 +145,7 @@ func retract_hook():
 		#rope_line.set_visible(false)
 
 	# Position hook at player to avoid C++ constraint (within 400 unit threshold)
-	hook.global_position = global_position
+	#hook.global_position = global_position
 
 func _input(event):
 	# Handle mouse clicks for grappling hook

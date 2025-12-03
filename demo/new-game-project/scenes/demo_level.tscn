@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://ctv75h3bqn8qt"]
+[gd_scene load_steps=6 format=3 uid="uid://ctv75h3bqn8qt"]
 
 [ext_resource type="Texture2D" uid="uid://c6l7mmrspyot1" path="res://icon.svg" id="1_icon"]
 [ext_resource type="PackedScene" uid="uid://dmx6voixm40f" path="res://scenes/grappling_hook.tscn" id="2_hook"]
@@ -6,6 +6,9 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
 size = Vector2(200, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fxo6y"]
+size = Vector2(116.667, 58.3333)
 
 [node name="DemoLevel" type="Node2D"]
 
@@ -147,6 +150,34 @@ offset_right = 100.0
 offset_bottom = 10.0
 color = Color(0.8, 0.6, 0.2, 1)
 
+[node name="HighPlatform2" type="StaticBody2D" parent="Platforms"]
+position = Vector2(935, -138)
+collision_layer = 5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/HighPlatform2"]
+shape = SubResource("RectangleShape2D_platform")
+
+[node name="ColorRect" type="ColorRect" parent="Platforms/HighPlatform2"]
+offset_left = -100.0
+offset_top = -10.0
+offset_right = 100.0
+offset_bottom = 10.0
+color = Color(0.8, 0.6, 0.2, 1)
+
+[node name="HighPlatform3" type="StaticBody2D" parent="Platforms"]
+position = Vector2(308, -398)
+collision_layer = 5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/HighPlatform3"]
+shape = SubResource("RectangleShape2D_platform")
+
+[node name="ColorRect" type="ColorRect" parent="Platforms/HighPlatform3"]
+offset_left = -100.0
+offset_top = -10.0
+offset_right = 100.0
+offset_bottom = 10.0
+color = Color(0.8, 0.6, 0.2, 1)
+
 [node name="Player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("hook", "camera")]
 position = Vector2(576, 550)
 script = ExtResource("3_player")
@@ -154,8 +185,9 @@ hook = NodePath("../GrapplingHook")
 camera = NodePath("../Camera2D")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+position = Vector2(-0.5, 0.5)
 scale = Vector2(0.3, 0.6)
-shape = SubResource("RectangleShape2D_platform")
+shape = SubResource("RectangleShape2D_fxo6y")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
 modulate = Color(0, 0.7, 1, 1)
