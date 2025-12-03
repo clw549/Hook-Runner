@@ -28,7 +28,8 @@ void GrapplingHook::_bind_methods() {
 
 void GrapplingHook::_ready() {
   collider = get_node<CollisionShape2D>("CollisionShape2D");
-  collider->connect("body_entered", Callable(this, "OnHookHitBody"));
+  // Note: CollisionShape2D doesn't have body_entered signal
+  // We use move_and_collide() for collision detection instead
   _rope_line = get_node<Line2D>("Line");
     if (_rope_line) {
         _rope_line->clear_points();
@@ -38,7 +39,8 @@ void GrapplingHook::_ready() {
 }
 
 GrapplingHook::GrapplingHook() {
-  speed = 50;
+  speed = 500;
+  set_visible(false); // Start hidden
 
 }
 
@@ -84,13 +86,27 @@ void GrapplingHook::_physics_process(double delta) {
 
 
 void GrapplingHook::ShootHook(Vector2 direction) {
-  _shoot_direction = direction.normalized();
+  if (_hooked) return; // Don't shoot if already hooked
 
-  //todo: instantiate child pointing in the direction of direction
+  _shoot_direction = direction.normalized();
+  _hooked = false;
+
+  // Position hook at player position to start shooting
+  if (_player) {
+    set_global_position(_player->get_global_position());
+  }
+
+  set_visible(true);
 }
 
 void GrapplingHook::RetractHook() {
+  _hooked = false;
+  _shoot_direction = Vector2(0, 0);
+  set_visible(false);
 
+  if (_rope_line) {
+    _rope_line->set_visible(false);
+  }
 }
 
 void GrapplingHook::OnHookHitBody(KinematicCollision2D *collision) {
@@ -106,7 +122,7 @@ void GrapplingHook::AimGuide(bool show) {
 }
 
 void GrapplingHook::SetMaxHookLength(float length) {
-
+  _maxLength = length;
 }
 
 void GrapplingHook::SetGrapplingHook(Node2D *hook) {

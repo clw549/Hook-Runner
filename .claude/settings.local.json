@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(scons)",
+      "Bash(git submodule:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
