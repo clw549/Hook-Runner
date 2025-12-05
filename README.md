@@ -10,3 +10,5 @@
 - holds the source files, the files responsible for the extension and features
 ## godot-cpp
 - holds files for building in the godot libraries for the extension, do not change!
+## docs
+- holds files for documentation, use, and compiling the module.
