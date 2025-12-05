@@ -70,15 +70,20 @@ public partial class MainCharacter : CharacterBody2D
 		}
 
 		// Get the input direction and handle the movement/deceleration.
-		Vector2 direction = Input.GetVector("left", "right", "up", "down");
+		// Only use left/right for horizontal movement
+		float horizontalInput = 0;
+		if (Input.IsActionPressed("left"))
+			horizontalInput = -1;
+		else if (Input.IsActionPressed("right"))
+			horizontalInput = 1;
 
-		if (direction.X != 0)
+		if (horizontalInput != 0)
 		{
-			velocity.X = direction.X * Speed;
+			velocity.X = horizontalInput * Speed;
 
 			// Flip sprite when going left
 			if (_anim != null)
-				_anim.FlipH = direction.X < 0;
+				_anim.FlipH = horizontalInput < 0;
 		}
 		else
 		{
