@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Hook Runner"
-run/main_scene="uid://igqok8qpt0cb"
+run/main_scene="uid://duflt0h4dk3m6"
 config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
